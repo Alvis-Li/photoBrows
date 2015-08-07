@@ -8,9 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+typedef void(^refreshBlock)();
+
 @interface PhotoBrowser : UIView
 @property (strong, nonatomic) NSMutableArray *data;
 @property (assign, nonatomic) NSInteger index;
+@property (assign, nonatomic) BOOL canRefresh;
 
 - (id)initWithSourceData:(NSMutableArray *)data withIndex:(NSInteger)index;
+
+-(void)setBlock:(refreshBlock)block;
+-(void)viewDidLoad;
 @end

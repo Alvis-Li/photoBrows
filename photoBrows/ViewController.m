@@ -33,7 +33,24 @@
     // Dispose of any resources that can be recreated.
 }
 - (IBAction)tap:(UITapGestureRecognizer *)sender {
-    PhotoBrowser * view = [[PhotoBrowser alloc]initWithSourceData:_arr withIndex:1];
+    
+    NSArray * array = @[[UIImage imageNamed:@"photo4.jpg"], [UIImage imageNamed:@"photo5.jpg"], [UIImage imageNamed:@"photo6.jpg"]];
+
+    PhotoBrowser * view = [[PhotoBrowser alloc]initWithSourceData:_arr withIndex:2];
+    
+    __weak PhotoBrowser * tempView = view;
+    [view setBlock:^{
+        NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:
+                               NSMakeRange(0,[array count])];
+        
+        [_arr insertObjects:array atIndexes:indexes];
+        [tempView setIndex:array.count+1];
+        [tempView setData:_arr];
+        [tempView setCanRefresh:YES];
+        [tempView viewDidLoad];
+    }];
+    
+    
     [view setFrame:self.view.frame];
     [view setAlpha:0];
     [self.view addSubview:view];
