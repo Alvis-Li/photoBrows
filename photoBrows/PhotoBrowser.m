@@ -104,19 +104,24 @@
             imageScale = pin.scale = 1;
             [UIView animateWithDuration:0.3 animations:^{
                 pin.view.transform = CGAffineTransformMakeScale(1,1);
-                
+                [imageScaleArray setObject:[NSNumber numberWithFloat:imageScale] atIndexedSubscript:pin.view.tag-1000];
+
             }];
             return;
         }
     }else if(pin.state == UIGestureRecognizerStateBegan && imageScale != 0.0f){
         pin.scale = imageScale;
     }
+      NSLog(@" scale %f imageScale %f",pin.scale,imageScale);
     if (pin.scale>2.0f) {
         imageScale = pin.scale = 2;
     }
     
     if (pin.scale !=NAN && pin.scale != 0.0) {
+      
         pin.view.transform = CGAffineTransformMakeScale(pin.scale, pin.scale);
+        imageScale = pin.scale;
+        [imageScaleArray setObject:[NSNumber numberWithFloat:imageScale] atIndexedSubscript:pin.view.tag-1000];
     }
 }
 
