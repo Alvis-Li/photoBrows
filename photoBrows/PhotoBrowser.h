@@ -12,10 +12,12 @@ typedef void(^refreshBlock)();
 
 @interface PhotoBrowser : UIView
 @property (strong, nonatomic) NSMutableArray *data;
+@property (strong, nonatomic) NSMutableArray *dataUrl;
+
 @property (assign, nonatomic) NSInteger index;
 @property (assign, nonatomic) BOOL canRefresh;
 
-- (id)initWithSourceData:(NSMutableArray *)data withIndex:(NSInteger)index;
+-(id)initWithSourceData:(NSMutableArray *)data dataUrl:(NSMutableArray *)dataUrl withIndex:(NSInteger)index;
 
 -(void)setBlock:(refreshBlock)block;
 -(void)viewDidLoad;

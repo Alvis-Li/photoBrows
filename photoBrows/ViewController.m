@@ -20,7 +20,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSArray * array = @[[UIImage imageNamed:@"photo1.jpg"], [UIImage imageNamed:@"photo2.jpg"], [UIImage imageNamed:@"photo3.jpg"]];
+    NSArray * array = @[[UIImage imageNamed:@"photo1.jpg"]];
     
     _arr = [NSMutableArray arrayWithArray:array];
     
@@ -34,27 +34,15 @@
 }
 - (IBAction)tap:(UITapGestureRecognizer *)sender {
     
-    NSArray * array = @[[UIImage imageNamed:@"photo4.jpg"], [UIImage imageNamed:@"photo5.jpg"], [UIImage imageNamed:@"photo6.jpg"]];
-
-    PhotoBrowser * view = [[PhotoBrowser alloc]initWithSourceData:_arr withIndex:2];
+    NSMutableArray * imageArray = [NSMutableArray arrayWithArray:@[[UIImage imageNamed:@"photo1.jpg"]]];
+    NSMutableArray * imageUrlArray = [NSMutableArray arrayWithArray:@[@"http://img.bugwe.com/1yun/1c36e87a20f62bd87dc4ee93c4890aa2.jpg"]];
+    PhotoBrowser * view = [[PhotoBrowser alloc]initWithSourceData:imageArray dataUrl:imageUrlArray withIndex:0];
+    UIWindow * window = [[UIApplication sharedApplication].windows lastObject];
     
-    __weak PhotoBrowser * tempView = view;
-    [view setBlock:^{
-        NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:
-                               NSMakeRange(0,[array count])];
-        
-        [_arr insertObjects:array atIndexes:indexes];
-        [tempView setIndex:array.count+1];
-        [tempView setData:_arr];
-        [tempView setCanRefresh:YES];
-        [tempView viewDidLoad];
-    }];
-    
-    
-    [view setFrame:self.view.frame];
+    [view setFrame:window.frame];
     [view setAlpha:0];
-    [self.view addSubview:view];
-
+    [window addSubview:view];
+    
     [UIView animateWithDuration:0.2 animations:^{
         [view setAlpha:1];
     }];

@@ -20,11 +20,12 @@
 @end
 
 @implementation PhotoBrowser
--(id)initWithSourceData:(NSMutableArray *)data withIndex:(NSInteger)index
+-(id)initWithSourceData:(NSMutableArray *)data dataUrl:(NSMutableArray *)dataUrl withIndex:(NSInteger)index
 {
     self = [super init];
     if (self) {
         _data = [data copy];
+        _dataUrl = [dataUrl copy];
         _index = index ? index : 0;
         [self viewDidLoad];
     }
@@ -61,13 +62,16 @@
     
     
     for (int i = 0 ; i< _data.count; i++) {
-//        if ([[_data firstObject] isKindOfClass:[UIImage class]]) {
+        if ((_dataUrl == nil || _dataUrl.count == 0 ) && _data.count> 0) {
             UIImage * image = (UIImage *)_data[i];
             [self createImageScroll:image index:i];
-//        }else {
-//        [self createImageScroll:@"http://img.bugwe.com/1yun/1c36e87a20f62bd87dc4ee93c4890aa2.jpg" size:image.size index:i];
-//        }
-       
+        }else if(!(_dataUrl == nil || _dataUrl.count == 0 ) && _data.count> 0){
+            UIImage * image = (UIImage *)_data[i];
+            NSString *imageUrl = _dataUrl[i];//@"http://img.bugwe.com/1yun/1c36e87a20f62bd87dc4ee93c4890aa2.jpg"
+            [self createImageScroll:imageUrl image:image index:i];
+            
+        }
+        
     }
 }
 
@@ -82,17 +86,18 @@
         bottomScrollView.pagingEnabled = YES;
         bottomScrollView.backgroundColor = [UIColor clearColor];
         [self addSubview:bottomScrollView];
-
+        
     }
-    bottomScrollView.contentSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen ].applicationFrame)*_data.count, 0);
+    bottomScrollView.contentSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen ].applicationFrame)*_data.count+1, 0);
     bottomScrollView.contentOffset = CGPointMake(CGRectGetWidth([UIScreen mainScreen ].applicationFrame)*_index, 0);
-
+    
     for (UIView * view in bottomScrollView.subviews) {
         [view removeFromSuperview];
     }
 }
 
--(void)createImageScroll:(NSString *)url size:(CGSize)size index:(int)index{
+-(void)createImageScroll:(NSString *)url image:(UIImage *)image index:(int)index{
+    CGSize size = image.size;
     
     CGFloat width = CGRectGetWidth([UIScreen mainScreen ].applicationFrame);
     CGFloat hight = CGRectGetHeight([UIScreen mainScreen ].applicationFrame);
@@ -100,7 +105,7 @@
     CGRect rect = CGRectMake(0,  hight>yHight ?(hight - yHight)/2.f : 0, width, yHight);
     
     UIImageView *imageView = [[UIImageView alloc]init];
-    [imageView sd_setImageWithURL:[NSURL URLWithString:url]];
+    [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:image];
     [imageView setFrame:rect];
     [imageView setUserInteractionEnabled:YES];
     [imageView setTag:(1000+index)];
@@ -139,7 +144,7 @@
     [imageView setFrame:rect];
     [imageView setUserInteractionEnabled:YES];
     [imageView setTag:(1000+index)];
-     UIScrollView * bottomView = [[UIScrollView alloc]initWithFrame:CGRectMake(width*index, 0, width, hight)];
+    UIScrollView * bottomView = [[UIScrollView alloc]initWithFrame:CGRectMake(width*index, 0, width, hight)];
     [bottomView setBackgroundColor:[UIColor clearColor]];
     
     UIPinchGestureRecognizer *pin = [[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(handlePin:)];
@@ -148,7 +153,7 @@
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(handlePan:)];
     pan.delegate = self;
     pan.minimumNumberOfTouches = 2;
-
+    
     [imageView addGestureRecognizer:pin];
     [imageView addGestureRecognizer:pan];
     
@@ -174,7 +179,7 @@
             [UIView animateWithDuration:0.3 animations:^{
                 pin.view.transform = CGAffineTransformMakeScale(1,1);
                 [imageScaleArray setObject:[NSNumber numberWithFloat:imageScale] atIndexedSubscript:pin.view.tag-1000];
-
+                
             }];
             return;
         }
@@ -186,7 +191,7 @@
     }
     
     if (pin.scale !=NAN && pin.scale != 0.0) {
-      
+        
         pin.view.transform = CGAffineTransformMakeScale(pin.scale, pin.scale);
         imageScale = pin.scale;
         [imageScaleArray setObject:[NSNumber numberWithFloat:imageScale] atIndexedSubscript:pin.view.tag-1000];
@@ -236,7 +241,7 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
     
     if (scrollView.contentOffset.x <= CGRectGetWidth([UIApplication sharedApplication].keyWindow.frame)) {
-        if (_canRefresh) {
+        if (_canRefresh && _data.count>2) {
             if (self.refreshBlock) {
                 _canRefresh = NO;
                 self.refreshBlock();
